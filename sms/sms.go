@@ -34,8 +34,9 @@ type SendMessageInput struct {
 
 // SendMessageResponse represents the send message response
 type SendMessageResponse struct {
-	Status    ResponseStatus `json:"status"`
-	ErrorCode ErrorCode      `json:"errorcode,omitempty"`
+	Status      ResponseStatus `json:"status"`
+	ErrorCode   ErrorCode      `json:"errorcode,omitempty"`
+	Description string         `json:"description,omitempty"`
 	// Mobile number portability status
 	// The subscriber may register to switch network but hold numbers
 	MNP MobileNumberPortability `json:"mnp"`
