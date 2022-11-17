@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://api-01.worldsms.vn"
+	defaultBaseURL      = "https://api-01.worldsms.vn"
+	defaultBaseDebitURL = "https://api-04.worldsms.vn"
 )
 
 type Client struct {
@@ -37,29 +38,43 @@ func NewClient(apiKey string) (*Client, error) {
 }
 
 type httpClient struct {
-	baseURL *url.URL
-	apiKey  string
-	client  *http.Client
-	logger  func(string, ...interface{})
+	baseURL      *url.URL
+	baseDebitURL *url.URL
+	apiKey       string
+	client       *http.Client
+	logger       func(string, ...interface{})
 }
 
 func newHTTPClient(apiKey string) *httpClient {
 	baseURL, _ := url.Parse(defaultBaseURL)
+	baseDebitURL, _ := url.Parse(defaultBaseDebitURL)
 	return &httpClient{
-		apiKey:  apiKey,
-		baseURL: baseURL,
-		client:  http.DefaultClient,
+		apiKey:       apiKey,
+		baseURL:      baseURL,
+		baseDebitURL: baseDebitURL,
+		client:       http.DefaultClient,
 	}
 }
 
-// SetBaseURL change the default OneSignal base URL
+// SetBaseURL change the default base URL
 func (c *httpClient) SetBaseURL(baseURL string) error {
 	sBaseURL, err := url.Parse(baseURL)
 	if err != nil {
-		panic(fmt.Sprintf("incorrect base url format: %s", baseURL))
+		return fmt.Errorf("incorrect base url format: %s", err)
 	}
 
 	c.baseURL = sBaseURL
+	return nil
+}
+
+// SetBaseDebitURL change the default base URL
+func (c *httpClient) SetBaseDebitURL(baseURL string) error {
+	sBaseURL, err := url.Parse(baseURL)
+	if err != nil {
+		return fmt.Errorf("incorrect base debit url format: %s", err)
+	}
+
+	c.baseDebitURL = sBaseURL
 	return nil
 }
 
@@ -76,11 +91,7 @@ func (c *httpClient) SetLogger(logger func(message string, args ...interface{}))
 // NewRequest create an API request.
 // path is a relative URL, like "/webapi/sendSMS".
 // The value pointed to by body is JSON encoded and included as the request body.
-func (c *httpClient) NewRequest(method, path string, body interface{}) (*http.Request, error) {
-	u, err := url.Parse(c.baseURL.String() + path)
-	if err != nil {
-		return nil, err
-	}
+func (c *httpClient) NewRequest(method string, u *url.URL, body interface{}) (*http.Request, error) {
 
 	c.printDebug(fmt.Sprintf("[SouthTelecomSMS] requesting url: %s", u.String()))
 

@@ -1,6 +1,7 @@
 package sms
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 )
@@ -17,7 +18,7 @@ type SendMessageInput struct {
 	// Text of the message that will be sent.
 	Text string `json:"text"`
 	// send message content with or without unicode
-	Unicode TextType `json:"unicode"`
+	Unicode *TextType `json:"unicode"`
 	// If dlr=1, report form telco will sent to customer via API
 	ReportType ReportType `json:"dlr"`
 	// ID of the message, defined by the customer.
@@ -50,12 +51,52 @@ type smsService struct {
 
 // SendMessage send SMS message to the target phone number
 func (ss *smsService) SendMessage(input SendMessageInput) (*SendMessageResponse, *http.Response, error) {
-	u, err := url.Parse("/webapi/sendSMS")
+	u, err := url.Parse(fmt.Sprintf("%s/webapi/sendSMS", ss.client.baseURL))
 	if err != nil {
 		return nil, nil, err
 	}
 	// create the request
-	req, err := ss.client.NewRequest("POST", u.String(), input)
+	req, err := ss.client.NewRequest("POST", u, input)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	result := &SendMessageResponse{}
+	resp, err := ss.client.Do(req, result)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return result, resp, err
+}
+
+// SendMessageInput represents the message request input
+type SendMessageDebitInput struct {
+	// Brand name of the message
+	// Represents sender ID and it can be alphanumeric or numeric.
+	// Alphanumeric sender ID length should be between 3 and 11 characters
+	From string `json:"from"`
+	// Message destination address.
+	// Destination address must be in international format (example: 84987654321)
+	To string `json:"to"`
+	// Text of the message that will be sent.
+	Text string `json:"text"`
+	// send message content with or without unicode
+	Unicode *TextType `json:"unicode"`
+	// If dlr=1, report form telco will sent to customer via API
+	ReportType ReportType `json:"dlr"`
+	// ID of the message, defined by the customer.
+	SmsID string `json:"smsid,omitempty"`
+}
+
+// SendMessageDebit send prepaid SMS message to the target phone number
+func (ss *smsService) SendMessageDebit(input SendMessageDebitInput) (*SendMessageResponse, *http.Response, error) {
+	u, err := url.Parse(fmt.Sprintf("%s/apidebit/sendSMS", ss.client.baseDebitURL))
+	if err != nil {
+		return nil, nil, err
+	}
+	// create the request
+	req, err := ss.client.NewRequest("POST", u, input)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -16,16 +16,19 @@ const (
 	StatusSuccess ResponseStatus = 1
 	StatusFailure ResponseStatus = 0
 
-	ErrCodeUnauthorized         ErrorCode = 40
-	ErrCodeInvalidPassword      ErrorCode = 41
-	ErrCodeInvalidUser          ErrorCode = 42
-	ErrCodeGatewayError         ErrorCode = 50
-	ErrCodeInvalidIP            ErrorCode = 51
-	ErrCodeInvalidInputParams   ErrorCode = 52
-	ErrCodeInvalidPhoneNumber   ErrorCode = 53
-	ErrCodeInvalidSender        ErrorCode = 54
-	ErrCodeInvalidContent       ErrorCode = 55
-	ErrCodeInvalidMessageLength ErrorCode = 551
+	ErrCodeUnauthorized                    ErrorCode = 40
+	ErrCodeInvalidPassword                 ErrorCode = 41
+	ErrCodeInvalidUser                     ErrorCode = 42
+	ErrCodeGatewayError                    ErrorCode = 50
+	ErrCodeInvalidIP                       ErrorCode = 51
+	ErrCodeInvalidInputParams              ErrorCode = 52
+	ErrCodeInvalidPhoneNumber              ErrorCode = 53
+	ErrCodeInvalidSender                   ErrorCode = 54
+	ErrCodeInvalidContent                  ErrorCode = 55
+	ErrCodeSendDebitSmsApiPermissionDenied ErrorCode = 80
+	ErrCodeSendDebitSmsPermissionDenied    ErrorCode = 81
+	ErrCodeAccountOverQuota                ErrorCode = 82
+	ErrCodeInvalidMessageLength            ErrorCode = 551
 	// The phone number is not registered to Viettel but the message is encrypted
 	ErrCodeContentMustNotBeEncrypted ErrorCode = 552
 	// The phone number is registered to Viettel but the message isn't encrypted
@@ -57,3 +60,15 @@ const (
 	// Subscribers who register to switch network hold numbers
 	SwitchedNetwork MobileNumberPortability = 1
 )
+
+// NewTextAscii creates text ascii type reference
+func NewTextAscii() *TextType {
+	ty := TextAscii
+	return &ty
+}
+
+// NewTextUnicode creates text unicode type reference
+func NewTextUnicode() *TextType {
+	ty := TextUnicode
+	return &ty
+}
